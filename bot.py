@@ -95,7 +95,7 @@ async def cmd_start(message: Message):
         "🎯 Goal: donate <b>1,000,000</b> stars\n"
         "📉 Every star brings you one step closer to absolute poverty\n\n"
         "💡 <i>From rich to rags — one tap at a time</i>\n\n"
-        f"{'🆕 You haven't donated yet. Time to start!' if count == 0 else f'🔥 You've already donated <b>{count}</b> star' + ('s' if count != 1 else '') + '! Keep going!'}"
+        + ("🆕 You have not donated yet. Time to start!" if count == 0 else f"🔥 You have already donated <b>{count}</b> star{'s' if count != 1 else ''}! Keep going!")
     )
     await message.answer(text, reply_markup=kb, parse_mode="HTML")
 
