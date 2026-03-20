@@ -1,0 +1,4 @@
+.env
+stars.json
+__pycache__/
+*.pyc

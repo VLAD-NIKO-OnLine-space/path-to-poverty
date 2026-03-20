@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: path-to-poverty
+    runtime: docker
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: BASE_URL
+        sync: false
+      - key: PORT
+        value: "8080"
+    healthCheckPath: /health

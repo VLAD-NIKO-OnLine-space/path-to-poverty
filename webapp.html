@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Path to Poverty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f0f;
+  --card:#1a1a1a;
+  --tx:#ffffff;
+  --sub:#888;
+  --star:#f5a623;
+  --glow:rgba(245,166,35,.25);
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--tx);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.title{
+  font-family:'Creepster',system-ui,sans-serif;
+  font-size:38px;
+  font-weight:400;
+  letter-spacing:2px;
+  margin-bottom:6px;
+  color:var(--star);
+  text-shadow:0 0 20px rgba(245,166,35,.5),0 0 40px rgba(255,107,107,.3);
+  animation:title-glow 3s ease-in-out infinite;
+}
+.title span{
+  display:inline-block;
+  animation:title-wave 2s ease-in-out infinite;
+  animation-delay:var(--d);
+}
+@keyframes title-glow{
+  0%,100%{text-shadow:0 0 20px rgba(245,166,35,.5),0 0 40px rgba(255,107,107,.3)}
+  50%{text-shadow:0 0 30px rgba(245,166,35,.8),0 0 60px rgba(255,107,107,.5),0 0 80px rgba(255,159,243,.3)}
+}
+@keyframes title-wave{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+.subtitle{
+  font-size:14px;
+  color:var(--sub);
+  margin-bottom:24px;
+}
+.progress-wrap{
+  width:85%;
+  max-width:340px;
+  margin-bottom:36px;
+}
+.progress-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.progress-label{
+  font-size:12px;
+  color:var(--sub);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.progress-pct{
+  font-size:13px;
+  font-weight:700;
+  color:var(--star);
+}
+.progress-bar{
+  width:100%;
+  height:8px;
+  background:var(--card);
+  border-radius:4px;
+  overflow:hidden;
+  position:relative;
+}
+.progress-fill{
+  height:100%;
+  width:0%;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--star),#ff6b6b);
+  transition:width .6s ease;
+  position:relative;
+}
+.progress-fill::after{
+  content:'';
+  position:absolute;
+  right:0;top:0;bottom:0;
+  width:20px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25));
+  border-radius:0 4px 4px 0;
+}
+.progress-goal{
+  display:flex;
+  justify-content:space-between;
+  margin-top:6px;
+  font-size:11px;
+  color:var(--sub);
+}
+.progress-rank{
+  font-size:13px;
+  color:var(--tx);
+  text-align:center;
+  margin-top:8px;
+  opacity:.7;
+}
+.star-btn{
+  position:relative;
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  background:var(--card);
+  border:2px solid rgba(245,166,35,.15);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 0 60px var(--glow);
+}
+.star-btn:active{
+  transform:scale(.93);
+}
+.star-btn svg{
+  width:80px;
+  height:80px;
+  margin-bottom:8px;
+  filter:drop-shadow(0 0 12px var(--glow));
+  transition:transform .3s ease;
+}
+.star-btn .amount{
+  font-size:36px;
+  font-weight:700;
+  color:var(--star);
+}
+.counter{
+  margin-top:48px;
+  text-align:center;
+}
+.counter .num{
+  font-size:48px;
+  font-weight:700;
+  color:var(--star);
+  line-height:1;
+}
+.counter .desc{
+  font-size:13px;
+  color:var(--sub);
+  margin-top:4px;
+}
+
+/* ─── Effects ─── */
+
+/* Particles */
+.particle{
+  position:fixed;
+  pointer-events:none;
+  font-size:20px;
+  z-index:100;
+  animation:particle-fly 1s ease-out forwards;
+}
+@keyframes particle-fly{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0.3) rotate(var(--rot))}
+}
+
+/* Ripple ring */
+.ripple-ring{
+  position:absolute;
+  width:20px;height:20px;
+  border-radius:50%;
+  border:2px solid var(--star);
+  pointer-events:none;
+  animation:ring-expand .7s ease-out forwards;
+}
+@keyframes ring-expand{
+  0%{width:20px;height:20px;opacity:1;margin:-10px 0 0 -10px}
+  100%{width:280px;height:280px;opacity:0;margin:-140px 0 0 -140px}
+}
+
+/* Shockwave */
+.shockwave{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(245,166,35,.4) 0%,transparent 70%);
+  pointer-events:none;
+  animation:shock-grow .5s ease-out forwards;
+}
+@keyframes shock-grow{
+  0%{width:10px;height:10px;opacity:1;margin:-5px 0 0 -5px}
+  100%{width:350px;height:350px;opacity:0;margin:-175px 0 0 -175px}
+}
+
+/* Flash */
+.flash{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:50;
+  animation:flash-pop .3s ease-out forwards;
+}
+@keyframes flash-pop{
+  0%{opacity:1}
+  100%{opacity:0}
+}
+
+/* Confetti */
+.confetti{
+  position:fixed;
+  width:8px;height:8px;
+  pointer-events:none;
+  z-index:100;
+  animation:confetti-fall 1.5s ease-in forwards;
+}
+@keyframes confetti-fall{
+  0%{opacity:1;transform:translateY(0) rotate(0deg)}
+  100%{opacity:0;transform:translateY(100vh) rotate(720deg)}
+}
+
+/* Spiral stars */
+.spiral{
+  position:fixed;
+  pointer-events:none;
+  font-size:16px;
+  z-index:100;
+  animation:spiral-spin 1.2s ease-out forwards;
+}
+@keyframes spiral-spin{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(720deg) scale(0)}
+}
+
+/* Glitch */
+@keyframes glitch{
+  0%{transform:translate(0)}
+  20%{transform:translate(-3px,3px)}
+  40%{transform:translate(3px,-3px)}
+  60%{transform:translate(-2px,-2px)}
+  80%{transform:translate(2px,2px)}
+  100%{transform:translate(0)}
+}
+
+/* Bounce */
+@keyframes bounce{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.25)}
+  50%{transform:scale(0.9)}
+  70%{transform:scale(1.1)}
+  100%{transform:scale(1)}
+}
+
+/* Jelly */
+@keyframes jelly{
+  0%{transform:scale(1,1)}
+  25%{transform:scale(0.85,1.15)}
+  50%{transform:scale(1.1,0.9)}
+  75%{transform:scale(0.95,1.05)}
+  100%{transform:scale(1,1)}
+}
+
+/* Spin pulse */
+@keyframes spin-pulse{
+  0%{transform:rotate(0deg) scale(1)}
+  50%{transform:rotate(180deg) scale(1.2)}
+  100%{transform:rotate(360deg) scale(1)}
+}
+
+/* Rubber band */
+@keyframes rubber{
+  0%{transform:scale(1)}
+  30%{transform:scaleX(1.3) scaleY(0.75)}
+  40%{transform:scaleX(0.8) scaleY(1.2)}
+  50%{transform:scaleX(1.15) scaleY(0.85)}
+  65%{transform:scaleX(0.95) scaleY(1.05)}
+  75%{transform:scaleX(1.05) scaleY(0.95)}
+  100%{transform:scale(1)}
+}
+
+/* Neon pulse */
+@keyframes neon-pulse{
+  0%{box-shadow:0 0 60px var(--glow)}
+  50%{box-shadow:0 0 120px rgba(245,166,35,.6),0 0 200px rgba(245,166,35,.3)}
+  100%{box-shadow:0 0 60px var(--glow)}
+}
+
+/* Amount selector */
+.amount-bar{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-top:32px;
+  padding:6px;
+  background:var(--card);
+  border-radius:12px;
+  width:85%;
+  max-width:300px;
+}
+.amt-btn{
+  background:none;
+  border:none;
+  color:var(--sub);
+  font-size:13px;
+  font-weight:600;
+  padding:8px 4px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+.amt-btn.active{
+  background:var(--star);
+  color:#000;
+}
+.amt-btn:not(.active):active{
+  background:rgba(245,166,35,.15);
+}
+
+.pop{animation:bounce .4s ease}
+
+.status{
+  position:fixed;
+  bottom:24px;
+  font-size:13px;
+  color:var(--sub);
+  opacity:0;
+  transition:opacity .3s;
+}
+.status.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="title" id="titleEl">Path to Poverty</div>
+<div class="subtitle">from rich to rags</div>
+
+<div class="progress-wrap">
+  <div class="progress-header">
+    <span class="progress-label">poverty level</span>
+    <span class="progress-pct" id="pct">0%</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="fill"></div>
+  </div>
+  <div class="progress-goal">
+    <span id="starCount">0 ⭐</span>
+    <span>1,000,000 ⭐</span>
+  </div>
+  <div class="progress-rank" id="rank">Employed</div>
+</div>
+
+<div class="star-btn" id="starBtn" onclick="buystar()">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+          fill="#f5a623" stroke="#f5a623" stroke-width="0.5" stroke-linejoin="round"/>
+  </svg>
+  <div class="amount">1</div>
+</div>
+
+<div class="counter">
+  <div class="num" id="count">—</div>
+  <div class="desc">stars donated</div>
+</div>
+
+<div class="amount-bar">
+  <button class="amt-btn active" onclick="setAmount(1)">1 ⭐</button>
+  <button class="amt-btn" onclick="setAmount(10)">10 ⭐</button>
+  <button class="amt-btn" onclick="setAmount(50)">50 ⭐</button>
+  <button class="amt-btn" onclick="setAmount(100)">100 ⭐</button>
+  <button class="amt-btn" onclick="setAmount(500)">500 ⭐</button>
+  <button class="amt-btn" onclick="setAmount(1000)">1K ⭐</button>
+</div>
+
+<div class="status" id="status"></div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+tg.setHeaderColor('#0f0f0f');
+tg.setBackgroundColor('#0f0f0f');
+
+const countEl = document.getElementById('count');
+const statusEl = document.getElementById('status');
+const btnEl = document.getElementById('starBtn');
+const svgEl = btnEl.querySelector('svg');
+const fillEl = document.getElementById('fill');
+const pctEl = document.getElementById('pct');
+const rankEl = document.getElementById('rank');
+const starCountEl = document.getElementById('starCount');
+let busy = false;
+let starAmount = 1;
+
+function setAmount(n) {
+  starAmount = n;
+  document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  btnEl.querySelector('.amount').textContent = n;
+}
+
+const GOAL = 1000000;
+const ranks = [
+  [0,       'Employed'],
+  [100,     'Freelancer'],
+  [500,     'Broke Student'],
+  [1000,    'Ramen Budget'],
+  [5000,    'Selling Stuff'],
+  [10000,   'Borrowing Money'],
+  [25000,   'Maxed Credit Cards'],
+  [50000,   'Selling Organs'],
+  [100000,  'Living in a Box'],
+  [250000,  'Professional Beggar'],
+  [500000,  'Debt Legend'],
+  [750000,  'Almost There...'],
+  [1000000, 'Absolute Poverty'],
+];
+
+function updateProgress(count) {
+  const pct = Math.min((count / GOAL) * 100, 100);
+  // Min width so first stars show a sliver
+  const barPct = count > 0 ? Math.max(pct, 0.5) : 0;
+  fillEl.style.width = barPct + '%';
+  starCountEl.textContent = count.toLocaleString('en-US') + ' ⭐';
+  pctEl.textContent = pct < 0.01 && count > 0
+    ? '<0.01%'
+    : (pct < 1 ? pct.toFixed(4) : pct.toFixed(2)) + '%';
+  let currentRank = ranks[0][1];
+  for (const [threshold, name] of ranks) {
+    if (count >= threshold) currentRank = name;
+  }
+  rankEl.textContent = currentRank;
+}
+
+// Detect local mode (no Telegram WebApp context)
+const isLocal = !tg.initDataUnsafe?.user?.id;
+if (isLocal) console.log('⚡ Local mode — no payments, counter is local');
+
+let localCount = parseInt(localStorage.getItem('ptp_stars') || '0');
+loadCount();
+
+async function loadCount() {
+  let count = 0;
+  if (isLocal) {
+    count = localCount;
+  } else {
+    try {
+      const r = await fetch('/api/stars?id=' + tg.initDataUnsafe?.user?.id);
+      const d = await r.json();
+      count = d.count ?? 0;
+    } catch {}
+  }
+  countEl.textContent = count;
+  updateProgress(count);
+}
+
+// ─── Random effects pool ───
+
+const effects = [
+  effectParticles,
+  effectRippleRing,
+  effectShockwave,
+  effectScreenFlash,
+  effectConfetti,
+  effectSpiral,
+  effectGlitch,
+  effectNeonPulse,
+  effectFirework,
+  effectMatrixRain,
+];
+
+const btnAnimations = [
+  'bounce .4s ease',
+  'jelly .5s ease',
+  'spin-pulse .5s ease',
+  'rubber .6s ease',
+];
+
+function randomEffect() {
+  // Pick 1-3 random effects
+  const count = 1 + Math.floor(Math.random() * 2);
+  const shuffled = [...effects].sort(() => Math.random() - 0.5);
+  for (let i = 0; i < count; i++) shuffled[i]();
+
+  // Random button animation
+  const anim = btnAnimations[Math.floor(Math.random() * btnAnimations.length)];
+  btnEl.style.animation = 'none';
+  btnEl.offsetHeight; // reflow
+  btnEl.style.animation = anim;
+}
+
+function effectParticles() {
+  const emojis = ['⭐','✨','💫','🌟','⚡','🔥','💛','🪙','💸','😭','📉'];
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    const angle = (Math.PI * 2 * i) / 12 + (Math.random() - 0.5);
+    const dist = 80 + Math.random() * 150;
+    el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    el.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+    el.style.fontSize = (16 + Math.random() * 16) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+}
+
+function effectRippleRing() {
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'ripple-ring';
+      el.style.left = '50%';
+      el.style.top = '50%';
+      btnEl.appendChild(el);
+      setTimeout(() => el.remove(), 700);
+    }, i * 150);
+  }
+}
+
+function effectShockwave() {
+  const el = document.createElement('div');
+  el.className = 'shockwave';
+  el.style.left = '50%';
+  el.style.top = '50%';
+  btnEl.appendChild(el);
+  setTimeout(() => el.remove(), 500);
+}
+
+function effectScreenFlash() {
+  const colors = [
+    'radial-gradient(circle,rgba(245,166,35,.2) 0%,transparent 70%)',
+    'radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%)',
+    'radial-gradient(circle,rgba(255,100,50,.15) 0%,transparent 70%)',
+  ];
+  const el = document.createElement('div');
+  el.className = 'flash';
+  el.style.background = colors[Math.floor(Math.random() * colors.length)];
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 300);
+}
+
+function effectConfetti() {
+  const colors = ['#f5a623','#ff6b6b','#48dbfb','#ff9ff3','#feca57','#54a0ff','#5f27cd','#01a3a4'];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.width = (5 + Math.random() * 8) + 'px';
+    el.style.height = (5 + Math.random() * 8) + 'px';
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    el.style.animationDuration = (1 + Math.random() * 1) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+  }
+}
+
+function effectSpiral() {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 8; i++) {
+    const el = document.createElement('div');
+    el.className = 'spiral';
+    el.textContent = '⭐';
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    const angle = (Math.PI * 2 * i) / 8;
+    const dist = 120 + Math.random() * 80;
+    el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    el.style.animationDelay = (i * 0.05) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1400);
+  }
+}
+
+function effectGlitch() {
+  btnEl.style.animation = 'glitch .3s ease';
+  setTimeout(() => {
+    // Random color shift
+    svgEl.querySelector('path').setAttribute('fill', randomColor());
+    setTimeout(() => {
+      svgEl.querySelector('path').setAttribute('fill', '#f5a623');
+    }, 200);
+  }, 50);
+}
+
+function effectNeonPulse() {
+  btnEl.style.animation = 'neon-pulse .6s ease';
+  // Random border color flash
+  const c = randomColor();
+  btnEl.style.borderColor = c;
+  setTimeout(() => {
+    btnEl.style.borderColor = 'rgba(245,166,35,.15)';
+  }, 600);
+}
+
+function effectFirework() {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  // First: launch trail
+  setTimeout(() => {
+    // Then: explosion
+    for (let i = 0; i < 20; i++) {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.style.left = cx + 'px';
+      el.style.top = cy + 'px';
+      el.textContent = '';
+      el.style.width = '4px';
+      el.style.height = '4px';
+      el.style.borderRadius = '50%';
+      el.style.background = randomColor();
+      const angle = (Math.PI * 2 * i) / 20;
+      const dist = 60 + Math.random() * 140;
+      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      el.style.setProperty('--rot', '0deg');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+  }, 100);
+}
+
+function effectMatrixRain() {
+  const chars = '⭐💸💰🪙$¢€£¥₿';
+  for (let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = chars[Math.floor(Math.random() * chars.length)];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.top = '-20px';
+    el.style.background = 'none';
+    el.style.width = 'auto';
+    el.style.height = 'auto';
+    el.style.fontSize = (14 + Math.random() * 14) + 'px';
+    el.style.animationDelay = (Math.random() * 0.8) + 's';
+    el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+}
+
+function randomColor() {
+  const colors = ['#ff6b6b','#48dbfb','#ff9ff3','#feca57','#54a0ff','#5f27cd','#01a3a4','#f5a623','#ff9f43','#ee5a24'];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// ─── Buy flow ───
+
+async function buystar() {
+  if (busy) return;
+  busy = true;
+
+  // Play random effects on tap
+  randomEffect();
+
+  // Local mode — just increment counter
+  if (isLocal) {
+    localCount += starAmount;
+    localStorage.setItem('ptp_stars', localCount);
+    countEl.textContent = localCount;
+    updateProgress(localCount);
+    countEl.classList.remove('pop');
+    countEl.offsetHeight;
+    countEl.classList.add('pop');
+    showStatus('⭐ ' + starAmount + ' star' + (starAmount > 1 ? 's' : '') + ' donated! (local mode)');
+    busy = false;
+    return;
+  }
+
+  try {
+    const r = await fetch('/api/invoice', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: tg.initDataUnsafe?.user?.id,
+        init_data: tg.initData,
+        amount: starAmount
+      })
+    });
+    const d = await r.json();
+
+    if (!d.invoice_url) {
+      showStatus('Error creating invoice');
+      busy = false;
+      return;
+    }
+
+    tg.openInvoice(d.invoice_url, function(status) {
+      if (status === 'paid') {
+        countEl.classList.remove('pop');
+        countEl.offsetHeight;
+        countEl.classList.add('pop');
+        loadCount();
+        showStatus('⭐ Star donated!');
+        effectConfetti();
+        effectParticles();
+      } else if (status === 'cancelled') {
+        showStatus('Cancelled');
+      } else {
+        showStatus('Payment ' + status);
+      }
+      busy = false;
+    });
+
+  } catch (e) {
+    showStatus('Connection error');
+    busy = false;
+  }
+}
+
+function showStatus(text) {
+  statusEl.textContent = text;
+  statusEl.classList.add('show');
+  setTimeout(() => statusEl.classList.remove('show'), 2500);
+}
+
+// Animated wavy title
+(function(){
+  const el = document.getElementById('titleEl');
+  const text = el.textContent;
+  el.textContent = '';
+  text.split('').forEach((ch, i) => {
+    const s = document.createElement('span');
+    s.textContent = ch === ' ' ? '\u00A0' : ch;
+    s.style.setProperty('--d', (i * 0.08) + 's');
+    el.appendChild(s);
+  });
+})();
+</script>
+</body>
+</html>
