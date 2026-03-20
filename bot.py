@@ -158,7 +158,8 @@ async def handle_invoice(request: web.Request) -> web.Response:
 
 
 async def handle_health(request: web.Request) -> web.Response:
-    return web.json_response({"status": "ok"})
+    info = await bot.get_webhook_info()
+    return web.json_response({"status": "ok", "webhook_url": info.url, "pending": info.pending_update_count})
 
 
 # ─── Startup / Shutdown ──────────────────────────────────────────────
