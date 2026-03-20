@@ -166,9 +166,12 @@ async def handle_health(request: web.Request) -> web.Response:
 
 async def on_startup(app: web.Application):
     webhook_url = f"{BASE_URL}{WEBHOOK_PATH}"
-    await bot.set_webhook(webhook_url)
-    log.info(f"🔗 Webhook set: {webhook_url}")
-    log.info(f"📱 Webapp URL: {BASE_URL}/webapp")
+    try:
+        await bot.set_webhook(webhook_url)
+        log.info(f"🔗 Webhook set: {webhook_url}")
+        log.info(f"📱 Webapp URL: {BASE_URL}/webapp")
+    except Exception as e:
+        log.error(f"❌ Failed to set webhook: {e}")
 
 
 async def on_shutdown(app: web.Application):
@@ -199,5 +202,4 @@ def main():
     web.run_app(app, host="0.0.0.0", port=PORT)
 
 
-if __name__ == "__main__":
-    main()
+main()
