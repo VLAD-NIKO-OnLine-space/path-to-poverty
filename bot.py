@@ -150,7 +150,6 @@ async def handle_invoice(request: web.Request) -> web.Response:
         title=f"⭐ Donate {amount} Star{'s' if amount > 1 else ''}",
         description=f"{amount} star{'s' if amount > 1 else ''} closer to poverty",
         payload=f"star_donation_{amount}",
-        provider_token="",
         currency="XTR",
         prices=[LabeledPrice(label="Stars", amount=amount)],
     )
