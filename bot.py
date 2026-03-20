@@ -87,12 +87,15 @@ async def cmd_start(message: Message):
         )]
     ])
 
+    name = message.from_user.first_name
     count = get_stars(message.from_user.id)
     text = (
-        "⭐ <b>Path to Poverty</b>\n\n"
-        "Donate stars, one at a time.\n"
-        "Every star brings you closer to financial enlightenment.\n\n"
-        f"Your stars so far: <b>{count}</b>"
+        f"👋 Hey <b>{name}</b>!\n\n"
+        "⭐ Welcome to <b>Path to Poverty</b>\n\n"
+        "🎯 Goal: donate <b>1,000,000</b> stars\n"
+        "📉 Every star brings you one step closer to absolute poverty\n\n"
+        "💡 <i>From rich to rags — one tap at a time</i>\n\n"
+        f"{'🆕 You haven't donated yet. Time to start!' if count == 0 else f'🔥 You've already donated <b>{count}</b> star' + ('s' if count != 1 else '') + '! Keep going!'}"
     )
     await message.answer(text, reply_markup=kb, parse_mode="HTML")
 
