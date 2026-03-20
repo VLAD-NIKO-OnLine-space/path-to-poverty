@@ -22,9 +22,11 @@ from aiogram.types import (
 )
 from aiogram.filters import CommandStart
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-from dotenv import load_dotenv
-
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 BASE_URL = os.getenv("BASE_URL", "").rstrip("/")
