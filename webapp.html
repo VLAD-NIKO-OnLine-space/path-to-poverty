@@ -509,7 +509,7 @@ function effectParticles() {
   const emojis = ['⭐','✨','💫','🌟','⚡','🔥','💛','🪙','💸','😭','📉'];
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight / 2;
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 6; i++) {
     const el = document.createElement('div');
     el.className = 'particle';
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -563,7 +563,7 @@ function effectScreenFlash() {
 
 function effectConfetti() {
   const colors = ['#f5a623','#ff6b6b','#48dbfb','#ff9ff3','#feca57','#54a0ff','#5f27cd','#01a3a4'];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 12; i++) {
     const el = document.createElement('div');
     el.className = 'confetti';
     el.style.left = (Math.random() * 100) + 'vw';
@@ -625,7 +625,7 @@ function effectFirework() {
   // First: launch trail
   setTimeout(() => {
     // Then: explosion
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 8; i++) {
       const el = document.createElement('div');
       el.className = 'particle';
       el.style.left = cx + 'px';
@@ -648,7 +648,7 @@ function effectFirework() {
 
 function effectMatrixRain() {
   const chars = '⭐💸💰🪙$¢€£¥₿';
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 8; i++) {
     const el = document.createElement('div');
     el.className = 'confetti';
     el.textContent = chars[Math.floor(Math.random() * chars.length)];
@@ -672,6 +672,27 @@ function randomColor() {
 
 // ─── Buy flow ───
 
+const invoiceCache = {};
+
+async function getInvoice(amount) {
+  if (invoiceCache[amount]) return invoiceCache[amount];
+  const r = await fetch('/api/invoice', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      user_id: tg.initDataUnsafe?.user?.id,
+      init_data: tg.initData,
+      amount: amount
+    })
+  });
+  const d = await r.json();
+  if (d.invoice_url) invoiceCache[amount] = d.invoice_url;
+  return d.invoice_url;
+}
+
+// Preload invoice for current amount
+if (!isLocal) setTimeout(() => getInvoice(1), 500);
+
 async function buystar() {
   if (busy) return;
   busy = true;
@@ -694,25 +715,17 @@ async function buystar() {
   }
 
   try {
-    const r = await fetch('/api/invoice', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        user_id: tg.initDataUnsafe?.user?.id,
-        init_data: tg.initData,
-        amount: starAmount
-      })
-    });
-    const d = await r.json();
+    const url = await getInvoice(starAmount);
 
-    if (!d.invoice_url) {
+    if (!url) {
       showStatus('Error creating invoice');
       busy = false;
       return;
     }
 
-    tg.openInvoice(d.invoice_url, function(status) {
+    tg.openInvoice(url, function(status) {
       if (status === 'paid') {
+        delete invoiceCache[starAmount]; // clear used invoice
         countEl.classList.remove('pop');
         countEl.offsetHeight;
         countEl.classList.add('pop');
@@ -720,6 +733,8 @@ async function buystar() {
         showStatus('⭐ Star donated!');
         effectConfetti();
         effectParticles();
+        // Preload next invoice
+        setTimeout(() => getInvoice(starAmount), 300);
       } else if (status === 'cancelled') {
         showStatus('Cancelled');
       } else {
